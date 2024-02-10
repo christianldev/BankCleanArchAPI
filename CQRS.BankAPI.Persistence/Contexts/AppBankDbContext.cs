@@ -1,6 +1,8 @@
 ﻿using CQRS.BankAPI.Application.Interfaces;
+using CQRS.BankAPI.Domain.Abstractions;
 using CQRS.BankAPI.Domain.Common;
 using CQRS.BankAPI.Domain.Entities;
+using CQRS.BankAPI.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,18 +13,19 @@ using System.Threading.Tasks;
 
 namespace CQRS.BankAPI.Persistence.Contexts
 {
-    public class AppBankDbContext : DbContext
+    public class AppBankDbContext : DbContext, IUnitOfWork
     {
         private readonly IDateTimeService _dateTimeService;
-        public AppBankDbContext(DbContextOptions<AppBankDbContext> options,IDateTimeService dateTimeService) : base(options)
+        public AppBankDbContext(DbContextOptions<AppBankDbContext> options, IDateTimeService dateTimeService) : base(options)
         {
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             _dateTimeService = dateTimeService;
         }
-        
-        public DbSet<Customer> Customers { get; set; }
 
-        public override  Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<User> Users { get; set; }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             foreach (var entry in ChangeTracker.Entries<AuditBaseEntity>())
             {
@@ -31,15 +34,15 @@ namespace CQRS.BankAPI.Persistence.Contexts
                     case EntityState.Added:
                         entry.Entity.CreatedOn = _dateTimeService.NowUtc;
                         break;
-                    
+
                     case EntityState.Modified:
                         entry.Entity.LastModified = _dateTimeService.NowUtc;
                         break;
-                    
+
                 }
             }
 
-            return  base.SaveChangesAsync(cancellationToken);
+            return base.SaveChangesAsync(cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,7 +1,6 @@
-﻿using CQRS.BankAPI.Domain.Entities.Users;
-using CQRS.BankAPI.Domain.Users;
+﻿using CQRS.BankAPI.Domain.Users;
 
-namespace CQRS.BankAPI.Domain;
+namespace CQRS.BankAPI.Domain.Entities.Users;
 
 public interface IUserRepository
 {

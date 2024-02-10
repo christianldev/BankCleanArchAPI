@@ -1,12 +1,9 @@
 ﻿namespace CQRS.BankAPI.Domain;
 
-public sealed record Dni
+public sealed record Dni(string Value)
 {
-    private Dni(string value) => Value = value;
     private const int DefaultLenght = 10;
     private const int MaxLenght = 10;
-
-    public string Value { get; init; }
 
     public static Dni? Create(string value)
     {
@@ -41,7 +38,5 @@ public sealed record Dni
     public static implicit operator Dni(string dni) => Create(dni)!;
 
     public override string ToString() => Value;
-
-
-
 }
+

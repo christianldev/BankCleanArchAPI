@@ -5,6 +5,7 @@ using CQRS.BankAPI.Application.Exceptions;
 using CQRS.BankAPI.Application.Interfaces;
 using CQRS.BankAPI.Application.Wrappers;
 using CQRS.BankAPI.Domain.Settings;
+using CQRS.BankAPI.Domain.Users;
 using CQRS.BankAPI.Identity.Helpers;
 using CQRS.BankAPI.Identity.Models;
 using Microsoft.AspNetCore.Identity;
@@ -148,5 +149,9 @@ namespace CQRS.BankAPI.Identity.Services
             rngCryptoServiceProvider.GetBytes(randomByte);
             return BitConverter.ToString(randomByte).Replace("-", string.Empty);
         }
+
+
+
+
     }
 }

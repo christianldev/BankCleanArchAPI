@@ -16,4 +16,9 @@ public static class UserErrors
         "User.InvalidEmail",
         "El correo electrónico proporcionado es inválido");
 
+    public static Error AlreadyExists = new(
+        "User.AlreadyExists",
+        "El usuario especificado ya existe");
+
+
 }
