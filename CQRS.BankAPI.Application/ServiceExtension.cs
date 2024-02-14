@@ -15,9 +15,13 @@ namespace CQRS.BankAPI.Application
             services.AddMediatR(config =>
             {
                 config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
+                config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+                config.AddOpenBehavior(typeof(ValidationBehavior<,>));
             });
             services.AddValidatorsFromAssemblyContaining<ApplicationAssemblyReference>();
+            services.AddValidatorsFromAssembly(typeof(ServiceExtension).Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
 
         }
     }

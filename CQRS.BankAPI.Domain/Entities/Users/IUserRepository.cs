@@ -16,4 +16,9 @@ public interface IUserRepository
         CancellationToken cancellationToken = default
     );
 
+    Task<bool> IsDniExists(
+        Dni dni,
+        CancellationToken cancellationToken = default
+    );
+
 }

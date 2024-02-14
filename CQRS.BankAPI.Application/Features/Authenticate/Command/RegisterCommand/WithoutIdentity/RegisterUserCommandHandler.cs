@@ -1,6 +1,7 @@
 
 
 using CQRS.BankAPI.Application.Abstractions.Messaging;
+using CQRS.BankAPI.Application.Helpers;
 using CQRS.BankAPI.Domain;
 using CQRS.BankAPI.Domain.Abstractions;
 using CQRS.BankAPI.Domain.Entities.Users;
@@ -32,6 +33,15 @@ internal class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand,
         var email = new Email(request.Email);
         var userExists = await _userRepository.IsUserExists(email);
 
+        //2. Validar que el DNI sea valido y no exista en la base de datos
+        var dni = new Dni(request.Dni);
+        var dniExists = await _userRepository.IsDniExists(dni);
+
+        if (dniExists)
+        {
+            return Result.Failure<Guid>(UserErrors.DniAlreadyExists);
+        }
+
         if (userExists)
         {
             return Result.Failure<Guid>(UserErrors.AlreadyExists);
@@ -40,6 +50,7 @@ internal class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand,
 
         //2. Encriptar el password plano del usuario que envio el cliente
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.PasswordHash);
+        var ipAddress = IpHelper.GetIpAddress();
 
         //3. Crear un objeto de tipo user
         var user = User.Create(
@@ -49,9 +60,8 @@ internal class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand,
             new Address(request.Province, request.City, request.District),
             new PhoneNumber(request.PhoneNumber),
             new Email(request.Email),
-            new PasswordHash(request.PasswordHash),
-            request.ConfirmPassword,
-            new IpUser(request.IpUser),
+            new PasswordHash(passwordHash),
+            new IpUser(ipAddress),
             new UserStatus(UserStatus.Active)
         );
 
@@ -61,6 +71,7 @@ internal class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand,
 
         await _unitOfWork.SaveChangesAsync();
 
-        return user.Id!.Value;
+        // return a message with status 200 OK and the user id
+        return Result.Success<Guid>(user.Id.Value);
     }
 }

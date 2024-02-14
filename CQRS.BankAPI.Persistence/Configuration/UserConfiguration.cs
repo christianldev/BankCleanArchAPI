@@ -12,7 +12,7 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         EntityTypeBuilder<User> builder
         )
     {
-        builder.ToTable("users");
+        builder.ToTable("Users");
         builder.HasKey(user => user.Id);
 
         builder.Property(user => user.Id)
@@ -45,10 +45,6 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.PasswordHash)
         .HasMaxLength(1000)
         .HasConversion(password => password!.Value, value => new PasswordHash(value));
-
-        builder.Property(user => user.ConfirmPassword)
-        .HasMaxLength(1000)
-        .HasColumnType("nvarchar");
 
         builder.Property(user => user.IpUser)
         .HasMaxLength(100)

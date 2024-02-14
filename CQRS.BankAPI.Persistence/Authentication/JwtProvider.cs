@@ -27,17 +27,17 @@ public sealed class JwtProvider : IJwtProvider
     {
         const string sql = """
               SELECT 
-                p.nombre
-              FROM users usr
-                LEFT JOIN users_roles usrl
-                    ON usr.id=usrl.user_id
-                LEFT JOIN roles rl
-                    ON rl.id=usrl.role_id
-                LEFT JOIN roles_permissions rp
-                    ON rl.id=rp.role_id
-                LEFT JOIN permissions p
-                    ON p.id=rp.permission_id
-                WHERE usr.id=@UserId            
+                p.Nombre
+              FROM Users usr
+                LEFT JOIN Users_Roles usrl
+                    ON usr.Id=usrl.UserId
+                LEFT JOIN Roles rl
+                    ON rl.Id=usrl.RoleId
+                LEFT JOIN Roles_Permissions rp
+                    ON rl.Id=rp.RoleId
+                LEFT JOIN Permissions p
+                    ON p.Id=rp.PermissionId
+                WHERE usr.Id=@UserId            
         """;
 
         using var connection = _sqlConnectionFactory.CreateConnection();

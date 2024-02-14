@@ -20,5 +20,10 @@ public static class UserErrors
         "User.AlreadyExists",
         "El usuario especificado ya existe");
 
+    public static Error DniAlreadyExists = new(
+        "User.DniAlreadyExists",
+        "El DNI especificado ya existe");
+
+
 
 }

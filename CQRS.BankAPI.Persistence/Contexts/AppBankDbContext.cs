@@ -1,5 +1,6 @@
 ﻿using CQRS.BankAPI.Application.Exceptions;
 using CQRS.BankAPI.Application.Interfaces;
+using CQRS.BankAPI.Domain;
 using CQRS.BankAPI.Domain.Abstractions;
 using CQRS.BankAPI.Domain.Common;
 using CQRS.BankAPI.Domain.Entities.Users;

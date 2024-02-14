@@ -21,7 +21,6 @@ public class User : Entity<UserId>
         PhoneNumber phoneNumber,
         Email email,
         PasswordHash passwordHash,
-        string confirmPassword,
         IpUser ipUser,
         UserStatus userstatus
         ) : base(id)
@@ -33,7 +32,6 @@ public class User : Entity<UserId>
         PhoneNumber = phoneNumber;
         Email = email;
         PasswordHash = passwordHash;
-        ConfirmPassword = confirmPassword;
         IpUser = ipUser;
         UserStatus = userstatus;
     }
@@ -45,7 +43,6 @@ public class User : Entity<UserId>
     public PhoneNumber PhoneNumber { get; private set; } = null!;
     public Email Email { get; private set; } = null!;
     public PasswordHash? PasswordHash { get; private set; } = null!;
-    public string? ConfirmPassword { get; private set; }
     public IpUser? IpUser { get; private set; }
     public UserStatus UserStatus { get; private set; }
 
@@ -57,12 +54,11 @@ public class User : Entity<UserId>
         PhoneNumber phoneNumber,
         Email email,
         PasswordHash passwordHash,
-        string confirmPassword,
         IpUser ipUser,
         UserStatus userstatus
     )
     {
-        var user = new User(UserId.New(), name, lastname, dni, address, phoneNumber, email, passwordHash, confirmPassword, ipUser, userstatus);
+        var user = new User(UserId.New(), name, lastname, dni, address, phoneNumber, email, passwordHash, ipUser, userstatus);
         user.RaiseDomainEvent(new UserCreatedDomainEvent(user.Id!));
         return user;
     }

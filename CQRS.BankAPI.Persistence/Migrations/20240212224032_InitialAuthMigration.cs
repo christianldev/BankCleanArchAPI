@@ -14,7 +14,30 @@ namespace CQRS.BankAPI.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "permissions",
+                name: "Customers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirtsName = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Permissions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -22,11 +45,11 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_permissions", x => x.Id);
+                    table.PrimaryKey("PK_Permissions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "roles",
+                name: "Roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -35,11 +58,11 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_roles", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "users",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -52,17 +75,16 @@ namespace CQRS.BankAPI.Persistence.Migrations
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(400)", maxLength: 400, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    ConfirmPassword = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     IpUser = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     UserStatus = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "roles_permissions",
+                name: "Roles_permissions",
                 columns: table => new
                 {
                     RoleId = table.Column<int>(type: "int", nullable: false),
@@ -70,23 +92,23 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_roles_permissions", x => new { x.RoleId, x.PermissionId });
+                    table.PrimaryKey("PK_Roles_permissions", x => new { x.RoleId, x.PermissionId });
                     table.ForeignKey(
-                        name: "FK_roles_permissions_permissions_PermissionId",
+                        name: "FK_Roles_permissions_Permissions_PermissionId",
                         column: x => x.PermissionId,
-                        principalTable: "permissions",
+                        principalTable: "Permissions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_roles_permissions_roles_RoleId",
+                        name: "FK_Roles_permissions_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "roles",
+                        principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "users_roles",
+                name: "Users_Roles",
                 columns: table => new
                 {
                     RoleId = table.Column<int>(type: "int", nullable: false),
@@ -94,23 +116,23 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_users_roles", x => new { x.RoleId, x.UserId });
+                    table.PrimaryKey("PK_Users_Roles", x => new { x.RoleId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_users_roles_roles_RoleId",
+                        name: "FK_Users_Roles_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "roles",
+                        principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_users_roles_users_UserId",
+                        name: "FK_Users_Roles_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "users",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                table: "permissions",
+                table: "Permissions",
                 columns: new[] { "Id", "Nombre" },
                 values: new object[,]
                 {
@@ -120,7 +142,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "roles",
+                table: "Roles",
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
@@ -129,7 +151,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "roles_permissions",
+                table: "Roles_permissions",
                 columns: new[] { "PermissionId", "RoleId" },
                 values: new object[,]
                 {
@@ -140,25 +162,25 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_roles_permissions_PermissionId",
-                table: "roles_permissions",
+                name: "IX_Roles_permissions_PermissionId",
+                table: "Roles_permissions",
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_Dni",
-                table: "users",
+                name: "IX_Users_Dni",
+                table: "Users",
                 column: "Dni",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_Email",
-                table: "users",
+                name: "IX_Users_Email",
+                table: "Users",
                 column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_roles_UserId",
-                table: "users_roles",
+                name: "IX_Users_Roles_UserId",
+                table: "Users_Roles",
                 column: "UserId");
         }
 
@@ -166,19 +188,22 @@ namespace CQRS.BankAPI.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "roles_permissions");
+                name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "users_roles");
+                name: "Roles_permissions");
 
             migrationBuilder.DropTable(
-                name: "permissions");
+                name: "Users_Roles");
 
             migrationBuilder.DropTable(
-                name: "roles");
+                name: "Permissions");
 
             migrationBuilder.DropTable(
-                name: "users");
+                name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

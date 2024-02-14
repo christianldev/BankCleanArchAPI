@@ -87,7 +87,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("permissions", (string)null);
+                    b.ToTable("Permissions", (string)null);
 
                     b.HasData(
                         new
@@ -121,7 +121,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("roles", (string)null);
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -148,7 +148,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.ToTable("roles_permissions", (string)null);
+                    b.ToTable("Roles_permissions", (string)null);
 
                     b.HasData(
                         new
@@ -177,10 +177,6 @@ namespace CQRS.BankAPI.Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConfirmPassword")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar");
 
                     b.Property<string>("Dni")
                         .IsRequired()
@@ -228,7 +224,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("CQRS.BankAPI.Domain.Users.UserRole", b =>
@@ -243,7 +239,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("users_roles", (string)null);
+                    b.ToTable("Users_Roles", (string)null);
                 });
 
             modelBuilder.Entity("CQRS.BankAPI.Domain.Roles.RolePermission", b =>
@@ -282,7 +278,7 @@ namespace CQRS.BankAPI.Persistence.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("users");
+                            b1.ToTable("Users");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");

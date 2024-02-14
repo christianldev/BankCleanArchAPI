@@ -34,59 +34,60 @@ namespace CQRS.BankAPI.Identity
 
             services.AddTransient<IAccountService, AccountService>();
             services.Configure<JwtSetting>(configuration.GetSection("JwtSettings"));
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            // services.AddAuthentication(options =>
+            // {
+            //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-             }).AddJwtBearer(jwt => {
-                 jwt.RequireHttpsMetadata = false;
-                 jwt.SaveToken = false;
-                 jwt.TokenValidationParameters = new()
-                 {
-                     ValidateIssuerSigningKey = true,
-                     ValidateIssuer = true,
-                     ValidateAudience = false,
-                     ValidateLifetime = true,
-                     ClockSkew= TimeSpan.Zero,
-                     ValidIssuer = configuration["JwtSettings:Issuer"],
-                     ValidAudience = configuration["JwtSettings:Audience"],
-                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),
+            // }).AddJwtBearer(jwt =>
+            // {
+            //     jwt.RequireHttpsMetadata = false;
+            //     jwt.SaveToken = false;
+            //     jwt.TokenValidationParameters = new()
+            //     {
+            //         ValidateIssuerSigningKey = true,
+            //         ValidateIssuer = true,
+            //         ValidateAudience = false,
+            //         ValidateLifetime = true,
+            //         ClockSkew = TimeSpan.Zero,
+            //         ValidIssuer = configuration["JwtSettings:Issuer"],
+            //         ValidAudience = configuration["JwtSettings:Audience"],
+            //         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),
 
-                 };
-                 jwt.Events = new JwtBearerEvents()
-                 {
-                     OnAuthenticationFailed = c =>
-                     {
-                         c.NoResult();
-                         c.Response.StatusCode = 500;
-                         c.Response.ContentType = "text/plain";
-                         return c.Response.WriteAsync(c.Exception.ToString());
+            //     };
+            //     jwt.Events = new JwtBearerEvents()
+            //     {
+            //         OnAuthenticationFailed = c =>
+            //         {
+            //             c.NoResult();
+            //             c.Response.StatusCode = 500;
+            //             c.Response.ContentType = "text/plain";
+            //             return c.Response.WriteAsync(c.Exception.ToString());
 
-                     },
-                     OnChallenge = context =>
-                     {
-                         context.HandleResponse();
-                         context.Response.StatusCode = 401;
-                         context.Response.ContentType = "application/json";
-                         var res = JsonSerializer.Serialize(new Response<string>("Access denied. You are not authorized to access the resource"));
-                         return context.Response.WriteAsync(res);
-                      },
-                     OnForbidden = context =>
-                     {
-                         context.Response.StatusCode = 403;
-                         context.Response.ContentType = "application/json";
-                         var res = JsonSerializer.Serialize(new Response<string>("You do not have permissions to access the resource"));
-                         return context.Response.WriteAsync(res);
+            //         },
+            //         OnChallenge = context =>
+            //         {
+            //             context.HandleResponse();
+            //             context.Response.StatusCode = 401;
+            //             context.Response.ContentType = "application/json";
+            //             var res = JsonSerializer.Serialize(new Response<string>("Access denied. You are not authorized to access the resource"));
+            //             return context.Response.WriteAsync(res);
+            //         },
+            //         OnForbidden = context =>
+            //         {
+            //             context.Response.StatusCode = 403;
+            //             context.Response.ContentType = "application/json";
+            //             var res = JsonSerializer.Serialize(new Response<string>("You do not have permissions to access the resource"));
+            //             return context.Response.WriteAsync(res);
 
-                     }
+            //         }
 
 
-                 };
+            //     };
 
-            });
+            // });
 
-           
+
         }
     }
 }

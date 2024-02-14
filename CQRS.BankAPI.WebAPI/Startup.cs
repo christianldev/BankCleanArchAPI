@@ -2,8 +2,12 @@
 using CQRS.BankAPI.Application.Enums;
 using CQRS.BankAPI.Identity;
 using CQRS.BankAPI.Persistence;
+using CQRS.BankAPI.Persistence.Authentication;
 using CQRS.BankAPI.Shared;
 using CQRS.BankAPI.WebAPI.Extensions;
+using CQRS.BankAPI.WebAPI.OptionsSetup;
+using Microsoft.AspNetCore.Authorization;
+using Serilog;
 
 namespace CQRS.BankAPI.WebAPI
 {
@@ -31,6 +35,7 @@ namespace CQRS.BankAPI.WebAPI
             services.AddSharedInfrastructure(Configuration);
             services.AddPersistenceInfrastructure(Configuration);
             services.AddControllers();
+            services.ConfigureOptions<JwtOptionsSetup>();
             services.AddApiVersioningExtension();
             services.AddSwaggerGen(c =>
             {
@@ -42,7 +47,13 @@ namespace CQRS.BankAPI.WebAPI
                 auth.AddPolicy("Admin", p => p.RequireRole(RolesEnum.Administrator.ToString()));
                 auth.AddPolicy("Basic", p => p.RequireRole(RolesEnum.Basic.ToString()));
             });
+            services
+            .AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
+            services
+            .AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
+
+            services.AddEndpointsApiExplorer();
             #endregion
 
 
@@ -65,6 +76,9 @@ namespace CQRS.BankAPI.WebAPI
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseRequestContextLogging();
+            app.UseSerilogRequestLogging();
+            app.UseCustomExceptionHandler();
             app.UseAuthentication();
             app.UseAuthorization();
 

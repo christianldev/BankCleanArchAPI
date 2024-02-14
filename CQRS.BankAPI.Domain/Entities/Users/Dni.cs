@@ -15,22 +15,28 @@ public sealed record Dni(string Value)
         return new Dni(value);
     }
 
-    // validation of verficator digit of DNI number
+    // validation of verficator digit of DNI number that contains 10 digits
     public static bool IsValid(string dni)
     {
-        if (string.IsNullOrEmpty(dni) || dni.Length != MaxLenght)
+        if (dni.Length != 10)
         {
             return false;
         }
 
-        var number = int.Parse(dni.Substring(0, 8));
-        var letter = dni.Substring(8, 1);
-        var letters = "TRWAGMYFPDXBNJZSQVHLCKE";
-        var index = number % 23;
-        var expectedLetter = letters[index];
-        return expectedLetter == letter[0];
-    }
+        int[] coefficients = { 2, 1, 2, 1, 2, 1, 2, 1, 2 };
 
+        int sum = 0;
+        for (int i = 0; i < coefficients.Length; i++)
+        {
+            int value = int.Parse(dni[i].ToString()) * coefficients[i];
+            sum += value > 9 ? value - 9 : value;
+        }
+
+        int checkDigit = 10 - sum % 10;
+        checkDigit = checkDigit == 10 ? 0 : checkDigit;
+
+        return checkDigit == int.Parse(dni[9].ToString());
+    }
     public static bool IsInvalid(string dni) => !IsValid(dni);
 
     public static implicit operator string(Dni dni) => dni.Value;

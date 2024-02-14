@@ -1,5 +1,6 @@
 
 using CleanArchitecture.Infrastructure.Repositories;
+using CQRS.BankAPI.Domain;
 using CQRS.BankAPI.Domain.Entities.Users;
 using CQRS.BankAPI.Domain.Users;
 using CQRS.BankAPI.Persistence.Contexts;
@@ -25,5 +26,13 @@ internal sealed class UserRepository : Repository<User, UserId>, IUserRepository
     {
         return await DbContext.Set<User>()
         .AnyAsync(x => x.Email == email);
+    }
+
+    public async Task<bool> IsDniExists(
+        Dni dni,
+        CancellationToken cancellationToken = default)
+    {
+        return await DbContext.Set<User>()
+        .AnyAsync(x => x.Dni == dni);
     }
 }
