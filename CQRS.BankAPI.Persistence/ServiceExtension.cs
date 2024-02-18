@@ -9,9 +9,10 @@ using CQRS.BankAPI.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Dapper;
 using CQRS.BankAPI.Persistence.Data;
-
+using MediatR;
+using CQRS.BankAPI.Application.Features.Authenticate.Command.AuthenticateCommand;
+using CQRS.BankAPI.Application.DTOS.Response;
 
 namespace CQRS.BankAPI.Persistence
 {
@@ -28,10 +29,12 @@ namespace CQRS.BankAPI.Persistence
 
             #region Repositories
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRequestHandler<LoginCommand, Result<TokenResponse>>, LoginCommandHandler>();
             services.AddTransient(typeof(IRepositoryAsync<>), typeof(MyRepositoryAsync<>));
             services.AddTransient<IJwtProvider, JwtProvider>();
             services.AddSingleton<ISqlConnectionFactory>(_ => new SqlConnectionFactory(connectionString));
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppBankDbContext>());
+
             #endregion
 
             #region Caching
