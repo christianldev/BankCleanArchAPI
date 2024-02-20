@@ -2,6 +2,7 @@
 using CQRS.BankAPI.Application.Features.Authenticate.Command.AuthenticateCommand;
 using CQRS.BankAPI.Application.Features.Authenticate.Command.RegisterCommand;
 using CQRS.BankAPI.Application.Features.Authenticate.Command.RegisterCommand.WithoutIdentity;
+using CQRS.BankAPI.Application.Features.Users.Commands.AuthenticateUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -111,7 +112,23 @@ namespace CQRS.BankAPI.WebAPI.Controllers.v1
 
         }
 
+        [Authorize]
+        [HttpPost("me")]
+        public async Task<IActionResult> Me(
+            [FromBody] MeTokenRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var command = new GetUserByTokenCommand(request.AuthToken);
+            var result = await _sender.Send(command, cancellationToken);
 
+            if (result.IsFailure)
+            {
+                return Unauthorized(result.Error);
+            }
+
+            return Ok(result.Value);
+        }
 
     }
 }

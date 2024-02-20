@@ -9,6 +9,8 @@ using CQRS.BankAPI.WebAPI.Extensions;
 using CQRS.BankAPI.WebAPI.OptionsSetup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 // {
 //     public class Program
@@ -84,7 +86,17 @@ builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddPersistenceInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer();
+.AddJwtBearer(
+   options =>
+ {
+     options.TokenValidationParameters = new TokenValidationParameters
+     {
+         ValidateIssuerSigningKey = true,
+         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("SecretKey")),
+         ValidateIssuer = false,
+         ValidateAudience = false
+     };
+ });
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 builder.Services.AddApiVersioningExtension();
@@ -113,7 +125,12 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseCors("AllowMyApp");
+    app.UseCors(
+        options => options.WithOrigins("http://localhost:4200")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+    );
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {

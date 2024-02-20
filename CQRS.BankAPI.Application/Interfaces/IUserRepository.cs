@@ -1,4 +1,6 @@
-﻿using CQRS.BankAPI.Domain.Users;
+﻿using CQRS.BankAPI.Application.DTOS.Request;
+using CQRS.BankAPI.Application.DTOS.Response;
+using CQRS.BankAPI.Domain.Users;
 
 namespace CQRS.BankAPI.Domain.Entities.Users;
 
@@ -20,5 +22,6 @@ public interface IUserRepository
         Dni dni,
         CancellationToken cancellationToken = default
     );
+
 
 }

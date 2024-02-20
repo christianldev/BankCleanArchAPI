@@ -1,5 +1,7 @@
 
 using CleanArchitecture.Infrastructure.Repositories;
+using CQRS.BankAPI.Application.DTOS.Request;
+using CQRS.BankAPI.Application.DTOS.Response;
 using CQRS.BankAPI.Domain;
 using CQRS.BankAPI.Domain.Entities.Users;
 using CQRS.BankAPI.Domain.Users;
@@ -33,6 +35,8 @@ internal sealed class UserRepository : Repository<User, UserId>, IUserRepository
         CancellationToken cancellationToken = default)
     {
         return await DbContext.Set<User>()
-        .AnyAsync(x => x.Dni == dni);
+            .AnyAsync(x => x.Dni == dni);
     }
+
+
 }
