@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json;
+using Microsoft.OpenApi.Models;
 
 // {
 //     public class Program
@@ -84,32 +86,64 @@ builder.Services.AddApplicationLayer();
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddPersistenceInfrastructure(builder.Configuration);
-builder.Services.AddControllers();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(
+   options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
 .AddJwtBearer(
    options =>
  {
+     options.RequireHttpsMetadata = false;
+     options.SaveToken = true;
      options.TokenValidationParameters = new TokenValidationParameters
      {
          ValidateIssuerSigningKey = true,
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("SecretKey")),
          ValidateIssuer = false,
-         ValidateAudience = false
+         ValidateAudience = false,
+         ValidateLifetime = true,
+         ClockSkew = TimeSpan.Zero
      };
  });
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddApiVersioningExtension();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "CQrS Bank API", Version = "v1.0" });
-
-});
 builder.Services.AddAuthorization(auth =>
             {
                 auth.AddPolicy("Admin", p => p.RequireRole(RolesEnum.Administrator.ToString()));
                 auth.AddPolicy("Basic", p => p.RequireRole(RolesEnum.Basic.ToString()));
             });
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CQrS Bank API", Version = "v1.0" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 builder.Services
 .AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
@@ -139,16 +173,16 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseRouting();
 await app.ApplyMigration();
 app.SeedDataAuthentication();
 app.UseRequestContextLogging();
+app.UseHttpsRedirection();
 app.UseSerilogRequestLogging();
-app.UseCustomExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseErrorHandlingMiddleware();
+app.UseCustomExceptionHandler();
 app.MapControllers();
 
 app.Run();

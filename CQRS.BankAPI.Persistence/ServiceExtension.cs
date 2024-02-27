@@ -31,7 +31,7 @@ namespace CQRS.BankAPI.Persistence
             #region Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRequestHandler<LoginCommand, Result<TokenResponse>>, LoginCommandHandler>();
-            services.AddScoped<IRequestHandler<GetUserByTokenCommand, Result<UserResponse>>, GetUserByTokenCommandHandler>();
+            services.AddScoped<ITokenHandler<Result<UserResponse>>, GetUserByTokenCommandHandler>();
             services.AddTransient(typeof(IRepositoryAsync<>), typeof(MyRepositoryAsync<>));
             services.AddTransient<IJwtProvider, JwtProvider>();
             services.AddSingleton<ISqlConnectionFactory>(_ => new SqlConnectionFactory(connectionString));

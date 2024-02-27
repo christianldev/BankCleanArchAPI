@@ -1,8 +1,11 @@
 ﻿using CQRS.BankAPI.Application.DTOS.Request;
+using CQRS.BankAPI.Application.DTOS.Response;
 using CQRS.BankAPI.Application.Features.Authenticate.Command.AuthenticateCommand;
 using CQRS.BankAPI.Application.Features.Authenticate.Command.RegisterCommand;
 using CQRS.BankAPI.Application.Features.Authenticate.Command.RegisterCommand.WithoutIdentity;
 using CQRS.BankAPI.Application.Features.Users.Commands.AuthenticateUser;
+using CQRS.BankAPI.Application.Interfaces;
+using CQRS.BankAPI.Domain.Abstractions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,15 +13,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace CQRS.BankAPI.WebAPI.Controllers.v1
 {
     [ApiVersion("1")]
-
+    [ApiController]
     public class AccountController : BaseApiController
     {
 
         private readonly ISender _sender;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AccountController(ISender sender)
+        public AccountController(ISender sender, IServiceProvider serviceProvider)
         {
             _sender = sender;
+            _serviceProvider = serviceProvider;
         }
 
         [HttpPost]
@@ -113,14 +118,13 @@ namespace CQRS.BankAPI.WebAPI.Controllers.v1
         }
 
         [Authorize]
-        [HttpPost("me")]
+        [HttpGet("me")]
         public async Task<IActionResult> Me(
-            [FromBody] MeTokenRequest request,
             CancellationToken cancellationToken
         )
         {
-            var command = new GetUserByTokenCommand(request.AuthToken);
-            var result = await _sender.Send(command, cancellationToken);
+            var handler = _serviceProvider.GetService<ITokenHandler<Result<UserResponse>>>();
+            var result = await handler.Handle(CancellationToken.None);
 
             if (result.IsFailure)
             {

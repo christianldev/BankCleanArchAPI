@@ -4,31 +4,33 @@ namespace CQRS.BankAPI.Application.Features.Users.Commands.AuthenticateUser
     using System.IdentityModel.Tokens.Jwt;
     using System.Threading;
     using System.Threading.Tasks;
-    using CQRS.BankAPI.Application.Abstractions.Messaging;
-    using CQRS.BankAPI.Application.Authentication;
-    using CQRS.BankAPI.Application.DTOS.Request;
     using CQRS.BankAPI.Application.DTOS.Response;
+    using CQRS.BankAPI.Application.Interfaces;
     using CQRS.BankAPI.Domain.Abstractions;
     using MediatR;
+    using Microsoft.AspNetCore.Http;
 
-    public class GetUserByTokenCommandHandler : IRequestHandler<GetUserByTokenCommand, Result<UserResponse>>
+    public class GetUserByTokenCommandHandler : ITokenHandler<Result<UserResponse>>
     {
-        private readonly IJwtProvider _jwtProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public GetUserByTokenCommandHandler(IJwtProvider jwtProvider)
+        public GetUserByTokenCommandHandler(IHttpContextAccessor httpContextAccessor)
         {
-            _jwtProvider = jwtProvider;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<Result<UserResponse>> Handle(GetUserByTokenCommand request, CancellationToken cancellationToken)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(request.AuthToken);
 
-            var userId = jwtToken.Claims.First(claim => claim.Type == "sub").Value;
-            var email = jwtToken.Claims.First(claim => claim.Type == "email").Value;
+        public async Task<Result<UserResponse>> Handle(CancellationToken cancellationToken)
+        {
+            var jwtToken = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwtToken);
+
+            var userId = token.Claims.First(claim => claim.Type == "sub").Value;
+            var email = token.Claims.First(claim => claim.Type == "email").Value;
 
             return Result.Success(new UserResponse { UserId = userId, Email = email });
+
         }
     }
 }

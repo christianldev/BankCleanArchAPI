@@ -62,7 +62,7 @@ namespace CQRS.BankAPI.WebAPI.Middlewares
                     "ServerError",
                     "Server error",
                     "An unexpected error has occurred",
-                    null)
+                    null),
             };
         }
 
